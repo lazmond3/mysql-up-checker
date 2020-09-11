@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	util "github.com/lazmond3/mysql-up-checker/utilType"
 )
 
@@ -28,23 +28,33 @@ func GetArg() util.ArgType {
 	}
 }
 
-func OpenSql(arg util.ArgType) bool {
-	dbLine := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?tls=skip-verify&autocommit=true",
+func OpenSql(arg util.ArgType) (string, bool) {
+	dbLine := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		arg.User,
 		arg.Password,
 		arg.Host,
 		strconv.Itoa(arg.Port),
 		arg.Dbname,
 	)
+	if len(arg.Password) == 0 {
+		dbLine = fmt.Sprintf("%s@tcp(%s:%s)/%s",
+			arg.User,
+			arg.Host,
+			strconv.Itoa(arg.Port),
+			arg.Dbname,
+		)
+	}
 
 	db, err := sql.Open("mysql", dbLine)
+	defer db.Close()
 	if err != nil {
-		println(err)
-		return false
+		msg := "db open failed: data source url is wrong."
+		return msg, false
 	}
-	// See "Important settings" section.
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-	return true
+	err = db.Ping()
+	if err != nil {
+		return "Ping failed.", false
+	}
+
+	return "succeeded!", true
 }
