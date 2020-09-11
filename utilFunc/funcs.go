@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	util "github.com/lazmond3/mysql-up-checker/src/utilType"
+	util "github.com/lazmond3/mysql-up-checker/utilType"
 )
 
 func GetArg() util.ArgType {

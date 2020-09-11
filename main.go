@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	funcs "github.com/lazmond3/mysql-up-checker/src/utilFunc"
+	funcs "github.com/lazmond3/mysql-up-checker/utilFunc"
 )
 
 func main() {
